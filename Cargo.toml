@@ -1,0 +1,19 @@
+[package]
+name = "clipwhisper"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anstyle = "1.0.4"
+anyhow = "1.0.75"
+clap = { version = "4.4.6", features = [ "derive" , "unstable-styles" ]}
+dotenvy = "0.15.7"
+env_logger = "0.10.0"
+interpolator = "0.5.0"
+log = "0.4.20"
+
+[dev-dependencies]
+quickcheck = "1.0.3"
+quickcheck_macros = "1.0.0"
