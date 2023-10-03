@@ -54,14 +54,14 @@
         in
         {
 
-          packages = {
+          packages = rec {
 
             clipwhisper = craneLib.buildPackage (commonArgs // {
               inherit cargoArtifacts;
               name = "clipwhisper";
               doCheck = false;
             });
-
+            default = clipwhisper;
           };
 
           checks = {
