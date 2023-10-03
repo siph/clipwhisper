@@ -18,8 +18,13 @@
     };
   };
 
-  outputs = inputs@{ flake-parts, fenix, crane, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } {
+  outputs = inputs @ {
+    flake-parts,
+    fenix,
+    crane,
+    ...
+  }:
+    flake-parts.lib.mkFlake {inherit inputs;} {
       systems = [
         "aarch64-linux"
         "x86_64-linux"
@@ -27,75 +32,79 @@
         "x86_64-darwin"
       ];
 
-      perSystem = { pkgs, lib, system, self', ... }:
-        let
-          toolchain = fenix.packages.${system}.default.toolchain;
+      perSystem = {
+        pkgs,
+        lib,
+        system,
+        self',
+        ...
+      }: let
+        toolchain = fenix.packages.${system}.default.toolchain;
 
-          craneLib = (crane.mkLib pkgs).overrideToolchain toolchain;
+        craneLib = (crane.mkLib pkgs).overrideToolchain toolchain;
 
-          src = lib.cleanSourceWith {
-            src = craneLib.path ./.;
-            filter = (path: type: craneLib.filterCargoSources path type);
-          };
+        src = lib.cleanSourceWith {
+          src = craneLib.path ./.;
+          filter = path: type: craneLib.filterCargoSources path type;
+        };
 
-          commonArgs = with pkgs; {
-            inherit src;
-            nativeBuildInputs = [ pkg-config ];
-            buildInputs = [ openssl ffmpeg ];
-          };
+        commonArgs = with pkgs; {
+          inherit src;
+          nativeBuildInputs = [pkg-config];
+          buildInputs = [openssl ffmpeg];
+        };
 
-          cargoArtifacts = craneLib.buildDepsOnly commonArgs;
+        cargoArtifacts = craneLib.buildDepsOnly commonArgs;
 
-          clipwhisper = craneLib.buildPackage (commonArgs // {
+        clipwhisper = craneLib.buildPackage (commonArgs
+          // {
             inherit cargoArtifacts;
             doCheck = false;
           });
-
-        in
-        {
-
-          packages = rec {
-
-            clipwhisper = craneLib.buildPackage (commonArgs // {
+      in {
+        packages = rec {
+          clipwhisper = craneLib.buildPackage (commonArgs
+            // {
               inherit cargoArtifacts;
               name = "clipwhisper";
               doCheck = false;
             });
-            default = clipwhisper;
-          };
+          default = clipwhisper;
+        };
 
-          checks = {
-            inherit clipwhisper;
+        checks = {
+          inherit clipwhisper;
 
-            clippy = craneLib.cargoClippy (commonArgs // {
+          clippy = craneLib.cargoClippy (commonArgs
+            // {
               inherit cargoArtifacts;
               cargoClippyExtraArgs = "-- -D warnings";
             });
 
-            cargo-fmt = craneLib.cargoFmt { inherit src; };
+          cargo-fmt = craneLib.cargoFmt {inherit src;};
 
-            nextest = craneLib.cargoNextest (commonArgs // { inherit cargoArtifacts; });
+          nextest = craneLib.cargoNextest (commonArgs // {inherit cargoArtifacts;});
 
-            pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
-              src = ./.;
-              hooks = {
-                rustfmt.enable = true;
-                nixpkgs-fmt.enable = true;
-              };
-            };
-          };
-
-          formatter = pkgs.nixpkgs-fmt;
-
-          devShells = with pkgs; {
-            default = mkShell {
-              inherit (self'.checks.pre-commit-check) shellHook;
-              inherit (commonArgs) nativeBuildInputs;
-              buildInputs = (commonArgs.buildInputs ++ [ toolchain ]);
-              CLIPWHISPER_LOG_LEVEL = "debug";
-              CLIPWHISPER_LOG_STYLE = "always";
+          pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
+            src = ./.;
+            hooks = {
+              rustfmt.enable = true;
+              alejandra.enable = true;
             };
           };
         };
+
+        formatter = pkgs.alejandra;
+
+        devShells = with pkgs; {
+          default = mkShell {
+            inherit (self'.checks.pre-commit-check) shellHook;
+            inherit (commonArgs) nativeBuildInputs;
+            buildInputs = commonArgs.buildInputs ++ [toolchain];
+            CLIPWHISPER_LOG_LEVEL = "debug";
+            CLIPWHISPER_LOG_STYLE = "always";
+          };
+        };
+      };
     };
 }
