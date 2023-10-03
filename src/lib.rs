@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use args::Args;
 
 use interpolator::{format, Formattable};
-use log::debug;
+use log::{debug, warn};
 
 pub mod args;
 
@@ -86,9 +86,9 @@ impl TargetTimeStamp {
         let start = offset;
         let end = match offset.overflowing_add(duration) {
             (_, true) => {
-                debug!("Locking end to prevent overflow.");
-                debug!("Start: {:?}", start);
-                debug!("Duration: {:?}", duration);
+                warn!("Locking end to prevent overflow.");
+                warn!("Start: {:?}", start);
+                warn!("Duration: {:?}", duration);
                 u32::max_value()
             }
             (end, false) => end,
@@ -106,11 +106,11 @@ impl TargetTimeStamp {
         // Bind `start` only if it exceeds video length.
         self.start = match video_length {
             length if self.start > length => {
-                debug!(
+                warn!(
                     "Value start `{}` exceeds video_length `{}`",
                     self.start, video_length
                 );
-                debug!(
+                warn!(
                     "Binding start `{}` to video_length `{}`",
                     self.start, video_length
                 );
@@ -122,11 +122,11 @@ impl TargetTimeStamp {
         // Bind `end` only if it exceeds video length.
         self.end = match video_length {
             length if self.end > length => {
-                debug!(
+                warn!(
                     "Value end `{}` exceeds video_length `{}`",
                     self.end, video_length
                 );
-                debug!(
+                warn!(
                     "Binding end `{}` to video_length `{}`",
                     self.end, video_length
                 );
