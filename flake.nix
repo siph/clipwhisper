@@ -92,6 +92,8 @@
               inherit (self'.checks.pre-commit-check) shellHook;
               inherit (commonArgs) nativeBuildInputs;
               buildInputs = (commonArgs.buildInputs ++ [ toolchain ]);
+              CLIPWHISPER_LOG_LEVEL = "debug";
+              CLIPWHISPER_LOG_STYLE = "always";
             };
           };
         };
