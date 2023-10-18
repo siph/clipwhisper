@@ -53,6 +53,7 @@ impl ClipCommand {
     /// Format and display the arguments as a list of strings.
     pub fn render_arguments(&self) -> Vec<String> {
         debug!("Rendering arguments for: {:#?}", self);
+
         let mut arguments: Vec<String> = vec![
             self.input.clone(),
             self.video_filter.format_chunk(&self.target),
@@ -64,9 +65,11 @@ impl ClipCommand {
 
         // This adds a flag to overwrite any file with the same path as `output`.
         arguments.push("-y".to_string());
+
         // output doesn't actually have a flag in `ffmpeg`, so `-o` will break the command.
         // This just appends the value to the end of the list.
         arguments.push(self.output.value.clone());
+
         arguments
     }
 }
@@ -84,6 +87,7 @@ impl TargetTimeStamp {
     /// Overflow safe `TargetTimeStamp` builder.
     pub fn new(offset: u32, duration: u32) -> Self {
         let start = offset;
+
         let end = match offset.overflowing_add(duration) {
             (_, true) => {
                 warn!("Locking end to prevent overflow.");
@@ -93,12 +97,14 @@ impl TargetTimeStamp {
             }
             (end, false) => end,
         };
+
         Self { start, end }
     }
 
     /// Bind `start` and `end` values to be valid within the available `max_length`.
     pub fn bind_values(&mut self, max_length: f32) -> Self {
         debug!("Checking if values need binding: {:#?}", &self);
+
         // truncate decimals. I think the implication of this is that it will be impossible to get
         // the last fraction of a second in a clip. But it sure makes the math easier.
         let video_length = max_length as u32;
@@ -110,10 +116,12 @@ impl TargetTimeStamp {
                     "Value start `{}` exceeds video_length `{}`",
                     self.start, video_length
                 );
+
                 warn!(
                     "Binding start `{}` to video_length `{}`",
                     self.start, video_length
                 );
+
                 length
             }
             _ => self.start,
@@ -126,10 +134,12 @@ impl TargetTimeStamp {
                     "Value end `{}` exceeds video_length `{}`",
                     self.end, video_length
                 );
+
                 warn!(
                     "Binding end `{}` to video_length `{}`",
                     self.end, video_length
                 );
+
                 length
             }
             _ => self.end,
@@ -151,6 +161,7 @@ impl CommandChunk {
     /// Returns `CommandChunk` with interpolated `start` and `end` for given `TargetTimeStamp`.
     pub fn format_chunk(&self, target: &TargetTimeStamp) -> Self {
         debug!("Formatting chunk: {:#?}", self);
+
         let formats = &[
             ("start", Formattable::display(&target.start)),
             ("end", Formattable::display(&target.end)),
