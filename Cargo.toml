@@ -8,11 +8,11 @@ edition = "2021"
 [dependencies]
 anstyle = "1.0.7"
 anyhow = "1.0.86"
-clap = { version = "4.5.4", features = [ "derive" , "unstable-styles" ]}
+clap = { version = "4.5.8", features = [ "derive" , "unstable-styles" ]}
 dotenvy = "0.15.7"
 env_logger = "0.11.3"
 interpolator = "0.5.0"
-log = "0.4.21"
+log = "0.4.22"
 
 [dev-dependencies]
 quickcheck = "1.0.3"
