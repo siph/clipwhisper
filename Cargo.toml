@@ -6,11 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anstyle = "1.0.7"
+anstyle = "1.0.8"
 anyhow = "1.0.86"
-clap = { version = "4.5.8", features = [ "derive" , "unstable-styles" ]}
+clap = { version = "4.5.13", features = [ "derive" , "unstable-styles" ]}
 dotenvy = "0.15.7"
-env_logger = "0.11.3"
+env_logger = "0.11.5"
 interpolator = "0.5.0"
 log = "0.4.22"
 
