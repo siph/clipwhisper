@@ -7,8 +7,8 @@ edition = "2021"
 
 [dependencies]
 anstyle = "1.0.8"
-anyhow = "1.0.86"
-clap = { version = "4.5.16", features = [ "derive" , "unstable-styles" ]}
+anyhow = "1.0.89"
+clap = { version = "4.5.19", features = [ "derive" , "unstable-styles" ]}
 dotenvy = "0.15.7"
 env_logger = "0.11.5"
 interpolator = "0.5.0"
